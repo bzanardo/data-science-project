@@ -13,9 +13,11 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-var client_id = 'CLIENT_ID'; // Your client id
-var client_secret = 'CLIENT_SECRET'; // Your secret
-var redirect_uri = 'REDIRECT_URI'; // Your redirect uri
+var client_id = 'ba55c7d3a7df4cfeb32d17775fa6ceca'; // Your client id
+var client_secret = 'fb85f14c92c948449c0b943742fc7b78'; // Your secret
+var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+
+const fs = require('fs');
 
 /**
  * Generates a random string containing numbers and letters
@@ -92,16 +94,46 @@ app.get('/callback', function(req, res) {
         var access_token = body.access_token,
             refresh_token = body.refresh_token;
 
+
         var options = {
-          url: 'https://api.spotify.com/v1/me',
+          url: 'https://api.spotify.com/v1/playlists/37i9dQZEVXbMDoHDwVN2tF/tracks',
           headers: { 'Authorization': 'Bearer ' + access_token },
           json: true
         };
 
+        var tracks = [];
+        var ids = [];
+
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          console.log(body);
+        	
+        	for (var i = 0; i < body["items"].length; i++) {
+        		tracks.push({
+        			id:  body["items"][i]["track"]["id"] , 
+        			values: {
+        				name: body["items"][i]["track"]["name"], 
+        				artists: body["items"][i]["track"]["artists"], 
+        				popularity: body["items"][i]["track"]["popularity"]
+        			}
+        		});
+        		//console.log(body["items"][i]["track"]["id"])
+        		ids.push(body["items"][i]["track"]["id"]);
+
+        	} 
+
+          fs.writeFileSync('top50.json', tracks); 
         });
+
+        /*var options = {
+          url: 'https://api.spotify.com/v1/playlists/37i9dQZEVXbMDoHDwVN2tF/tracks',
+          headers: { 'Authorization': 'Bearer ' + access_token },
+          json: true
+        };*/
+
+
+       for(var i = 0; i < ids.length; i++) {
+        	console.log(tracks[track][artists]);
+        }
 
         // we can also pass the token to the browser to make requests from there
         res.redirect('/#' +
