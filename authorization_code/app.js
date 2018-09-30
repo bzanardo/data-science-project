@@ -103,6 +103,7 @@ app.get('/callback', function(req, res) {
 
         var tracks = [];
         var ids = [];
+        var audio_features = [];
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
@@ -116,24 +117,38 @@ app.get('/callback', function(req, res) {
         				popularity: body["items"][i]["track"]["popularity"]
         			}
         		});
-        		//console.log(body["items"][i]["track"]["id"])
         		ids.push(body["items"][i]["track"]["id"]);
 
         	} 
 
-          fs.writeFileSync('top50.json', tracks); 
-        });
+        fs.writeFileSync('top50.json', JSON.stringify(tracks)); 
 
-        /*var options = {
-          url: 'https://api.spotify.com/v1/playlists/37i9dQZEVXbMDoHDwVN2tF/tracks',
-          headers: { 'Authorization': 'Bearer ' + access_token },
-          json: true
-        };*/
-
-
-       for(var i = 0; i < ids.length; i++) {
-        	console.log(tracks[track][artists]);
+		for(var i = 0; i < ids.length; i++) {
+        	var URL = 'https://api.spotify.com/v1/audio-features/' + String(ids[i]);
+        	var options = {
+          		url: URL,
+          		headers: { 'Authorization': 'Bearer ' + access_token },
+          		json: true
+        	};
+        	//current_id = ids[i];
+        	request.get(options, function(error, response, body) {
+        		/*for (var key in tracks) {
+        			if (String(tracks[key]["id"]) == current_id) {
+    					for (var k in body) {
+    						tracks[key]["values"][k] = body[k];
+    					}
+    					console.log(tracks);
+        			}
+        		}*/
+        		audio_features.push(body);
+        		
+        		
+        	});
+        	console.log(audio_features);
         }
+        fs.writeFileSync('audio-features.json', JSON.stringify(audio_features)); 
+
+        });
 
         // we can also pass the token to the browser to make requests from there
         res.redirect('/#' +
@@ -156,7 +171,7 @@ app.get('/refresh_token', function(req, res) {
   // requesting access token from refresh token
   var refresh_token = req.query.refresh_token;
   var authOptions = {
-    url: 'https://accounts.spotify.com/api/token',
+    url: 'https://accounts.spotify.com/api/audio-features',
     headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
     form: {
       grant_type: 'refresh_token',
