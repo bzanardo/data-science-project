@@ -102,7 +102,7 @@ app.get('/callback', function(req, res) {
         };
 
         var tracks = [];
-        var ids = [];
+        var ids = "";
         var audio_features = [];
 
         // use the access token to access the Spotify Web API
@@ -117,38 +117,102 @@ app.get('/callback', function(req, res) {
         				popularity: body["items"][i]["track"]["popularity"]
         			}
         		});
-        		ids.push(body["items"][i]["track"]["id"]);
+        		//ids.push(body["items"][i]["track"]["id"]);
+        		ids = ids + String(body["items"][i]["track"]["id"]) + ",";
+        	}
+        
 
-        	} 
+        //fs.writeFileSync('top50.json', JSON.stringify(tracks)); 
 
-        fs.writeFileSync('top50.json', JSON.stringify(tracks)); 
+		ids = ids.substring(0, ids.length - 1);
 
-		for(var i = 0; i < ids.length; i++) {
-        	var URL = 'https://api.spotify.com/v1/audio-features/' + String(ids[i]);
-        	var options = {
-          		url: URL,
-          		headers: { 'Authorization': 'Bearer ' + access_token },
-          		json: true
-        	};
-        	//current_id = ids[i];
-        	request.get(options, function(error, response, body) {
-        		/*for (var key in tracks) {
-        			if (String(tracks[key]["id"]) == current_id) {
-    					for (var k in body) {
-    						tracks[key]["values"][k] = body[k];
-    					}
-    					console.log(tracks);
+    	var URL = 'https://api.spotify.com/v1/audio-features/?ids=' + ids;
+    	var options = {
+      		url: URL,
+      		headers: { 'Authorization': 'Bearer ' + access_token },
+      		json: true
+    	}
+
+        request.get(options, function(error, response, body) {
+        		for (var i = 0; i < body["audio_features"].length; i++) {
+        			for (var key in tracks) {
+        				if (body["audio_features"][i]["id"] == tracks[key]["id"]) {
+        					for (var k in body["audio_features"][i]){
+        						tracks[key]["values"][k] = body["audio_features"][i][k];
+        					}
+        				}
         			}
-        		}*/
-        		audio_features.push(body);
-        		
-        		
-        	});
-        	console.log(audio_features);
-        }
-        fs.writeFileSync('audio-features.json', JSON.stringify(audio_features)); 
+        			/*audio_features.push({
+        				id: body["audio_features"][i]["id"] , 
+        				values: body["audio_features"][i]
+        				
+        			});*/
+        		}
+        	
+        	fs.writeFileSync('top50.json', JSON.stringify(tracks)); 	
+        });
+
+        var randomQuery = generateRandomString(1);
+        var randomOffset = (Math.floor(Math.random() * 1000));
+
+        var options = {
+      		url: 'https://api.spotify.com/v1/search?q=' + randomQuery + '&type=track&market=US&limit=50&offset=' + String(randomOffset),
+      		headers: { 'Authorization': 'Bearer ' + access_token },
+      		json: true
+    	}
+
+    	var randomTracks = [];
+    	var randomIds = "";
+
+        request.get(options, function(error, response, body) {
+        		for (var i = 0; i < body["tracks"]["items"].length; i++) {
+	        		randomTracks.push({
+	        			id:  body["tracks"]["items"][i]["id"] , 
+	        			values: {
+	        				name: body["tracks"]["items"][i]["name"], 
+	        				artists: body["tracks"]["items"][i]["artists"], 
+	        				popularity: body["tracks"]["items"][i]["popularity"]
+	        			}
+	        		});
+	        		//ids.push(body["items"][i]["track"]["id"]);
+	        		randomIds = randomIds + String(body["tracks"]["items"][i]["id"]) + ",";
+        		}
+
+        randomIds = randomIds.substring(0, randomIds.length - 1);
+
+    	var URL = 'https://api.spotify.com/v1/audio-features/?ids=' + randomIds;
+    	var options = {
+      		url: URL,
+      		headers: { 'Authorization': 'Bearer ' + access_token },
+      		json: true
+    	}
+    	console.log(URL)
+
+        request.get(options, function(error, response, body) {
+        		for (var i = 0; i < body["audio_features"].length; i++) {
+        			for (var key in randomTracks) {
+        				if (body["audio_features"][i]["id"] == randomTracks[key]["id"]) {
+        					for (var k in body["audio_features"][i]){
+        						randomTracks[key]["values"][k] = body["audio_features"][i][k];
+        						console.log(body["audio_features"][i][k]);
+        					}
+        				}
+        			}
+        			/*audio_features.push({
+        				id: body["audio_features"][i]["id"] , 
+        				values: body["audio_features"][i]
+        				
+        			});*/
+        		}
+
+        	console.log(randomTracks)
+        	
+        	fs.writeFileSync('random1.json', JSON.stringify(randomTracks)); 
+        	});	
+        });
 
         });
+
 
         // we can also pass the token to the browser to make requests from there
         res.redirect('/#' +
