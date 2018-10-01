@@ -151,6 +151,7 @@ app.get('/callback', function(req, res) {
         	
         	fs.writeFileSync('top50.json', JSON.stringify(tracks)); 	
         });
+        });
 
         var randomQuery = generateRandomString(1);
         var randomOffset = (Math.floor(Math.random() * 1000));
@@ -186,7 +187,6 @@ app.get('/callback', function(req, res) {
       		headers: { 'Authorization': 'Bearer ' + access_token },
       		json: true
     	}
-    	console.log(URL)
 
         request.get(options, function(error, response, body) {
         		for (var i = 0; i < body["audio_features"].length; i++) {
@@ -194,24 +194,20 @@ app.get('/callback', function(req, res) {
         				if (body["audio_features"][i]["id"] == randomTracks[key]["id"]) {
         					for (var k in body["audio_features"][i]){
         						randomTracks[key]["values"][k] = body["audio_features"][i][k];
-        						console.log(body["audio_features"][i][k]);
         					}
         				}
         			}
-        			/*audio_features.push({
-        				id: body["audio_features"][i]["id"] , 
-        				values: body["audio_features"][i]
-        				
-        			});*/
         		}
 
-        	console.log(randomTracks)
+        	//console.log(randomTracks)
         	
-        	fs.writeFileSync('random1.json', JSON.stringify(randomTracks)); 
+        	fs.writeFileSync('random20.json', JSON.stringify(randomTracks)); 
         	});	
         });
 
-        });
+        
+
+        //});
 
 
         // we can also pass the token to the browser to make requests from there
