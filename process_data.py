@@ -2,7 +2,7 @@ import json
 import pprint
 
 input_name = 'testing_data.json'
-input_fp = open(input_name, 'r')
+input_fp = open('data/' + input_name, 'r')
 samples = json.load(input_fp)
 
 # Label songs as popular/not-popular
@@ -39,5 +39,5 @@ for sample in samples:
     sample['discrete_features'] = [num_artists, key, mode, time_signature]
     sample['label'] = sample['values']['popularity'] >= popular_cutoff
 
-output_fp = open('processed_' + input_name, 'w')
+output_fp = open('data/processed_' + str(percentile) + '_' + input_name, 'w')
 json.dump(samples, output_fp)
