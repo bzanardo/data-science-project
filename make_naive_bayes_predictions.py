@@ -11,7 +11,7 @@ percent_training = 0.9
 
 random.seed()
 
-num_trials = 1000
+num_trials = 10000
 average_accuracy = 0
 average_cont_accuracy = 0
 average_disc_accuracy = 0
