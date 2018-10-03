@@ -41,7 +41,7 @@ for sample in samples:
     if sample['label']:
         num_popular += 1
 
-print('percent popular: ' + str(float(num_popular) / len(samples)))
+print('Num songs: ' + str(len(samples)) + ' Percent popular: ' + str(float(num_popular) / len(samples)))
 
 output_fp = open('data/processed_' + str(percentile) + '_' + input_name, 'w')
 json.dump(samples, output_fp)

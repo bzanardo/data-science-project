@@ -18,7 +18,7 @@ average_accuracy = 0
 average_cont_accuracy = 0
 average_disc_accuracy = 0
 
-for num_components in range(1, 6):
+for num_components in range(2, 3):
     for trial in range(num_trials):
         training_labels = []
         training_continuous = []
@@ -66,8 +66,8 @@ for num_components in range(1, 6):
         incorrect = 0
 
         for i in range(len(testing_labels)):
-            odds_unpopular = cont_pred[i][0] * disc_pred[i][0] / (1.0 - percent_training_popular)
-            odds_popular = cont_pred[i][1] * disc_pred[i][1] / percent_training_popular
+            odds_unpopular = cont_pred[i][0] * (1.0 - disc_pred[i][0]) / (1.0 - percent_training_popular)
+            odds_popular = cont_pred[i][1] * (1.0 - disc_pred[i][1]) / percent_training_popular
             prediction = odds_popular > odds_unpopular
             if prediction == testing_labels[i]:
                 correct += 1
