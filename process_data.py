@@ -10,12 +10,12 @@ popularity = []
 for sample in samples:
     popularity.append(sample['values']['popularity'])
 popularity.sort()
-percentile = 90
+percentile = 50
 percentile_index = int(((len(popularity) - 1) * percentile) / 100)
 popular_cutoff = popularity[percentile_index]
 
 # pprint.pprint(samples[0])
-
+num_popular = 0
 for sample in samples:
     acousticness = sample['values']['acousticness']
     danceability = sample['values']['danceability']
@@ -38,6 +38,10 @@ for sample in samples:
                                      tempo, valence]
     sample['discrete_features'] = [num_artists, key, mode, time_signature]
     sample['label'] = sample['values']['popularity'] >= popular_cutoff
+    if sample['label']:
+        num_popular += 1
+
+print('percent popular: ' + str(float(num_popular) / len(samples)))
 
 output_fp = open('data/processed_' + str(percentile) + '_' + input_name, 'w')
 json.dump(samples, output_fp)
