@@ -13,7 +13,9 @@ popularity_num = [s['values']['popularity'] for s in samples]
 popularity_flag = [1 if s['label'] else 0 for s in samples]
 
 discrete_values = [s['discrete_features'] for s in samples]
+discrete_feature_names = samples[0]['discrete_feature_names']
 continuous_values = [s['continuous_features'] for s in samples]
+continuous_feature_names = samples[0]['continuous_feature_names']
 
 print('\n#################### CHI SQUARED ######################\n')
 
@@ -39,7 +41,8 @@ for feature_idx in range(len(discrete_values[0])):
 		exp_vector.append(
 			[(pop_counts[0] * col_total[0]) / float(total),
 			 (pop_counts[1] * col_total[1]) / float(total)])
-	print('Result for feature ' + str(feature_idx) + ' which has the following values:')
+	print('Result for feature ' + str(feature_idx) + ' (' + \
+		discrete_feature_names[feature_idx] + ') which has the following values:')
 	pprint.pprint([k for k in fv_pop_counts])
 	# pprint.pprint(obs_vector)
 	# pprint.pprint(exp_vector)
@@ -49,4 +52,6 @@ for feature_idx in range(len(discrete_values[0])):
 print('\n#################### COVARIANCE ######################\n')
 for feature_idx in range(len(continuous_values[0])):
 	feature_values = [c[feature_idx] for c in continuous_values]
-	print('Covariance between feature ' + str(feature_idx) + ' and popularity: ' + str(np.cov(feature_values, popularity_num)[0][1])) 
+	print('Covariance between feature ' + str(feature_idx) + ' (' + \
+		continuous_feature_names[feature_idx] + ') and popularity: \t' + \
+		str(np.cov(feature_values, popularity_num)[0][1]))

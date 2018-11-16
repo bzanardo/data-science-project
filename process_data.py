@@ -31,7 +31,10 @@ for sample in samples:
 		sample['continuous_features'] = [acousticness, danceability, duration_ms, energy,
 			instrumentalness, liveness, loudness, speechiness,
 			tempo, valence]
+		sample['continuous_feature_names'] = ['acousticness', 'danceability', 'duration_ms',
+			'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'tempo', 'valence']
 		sample['discrete_features'] = [num_artists, key, mode, time_signature]
+		sample['discrete_feature_names'] = ['num_artists', 'key', 'mode', 'time_signature']
 	else:
 		num_missing_values += 1
 		sample['has_values'] = False
