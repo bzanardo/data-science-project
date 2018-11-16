@@ -15,8 +15,10 @@ popularity_flag = [1 if s['label'] else 0 for s in samples]
 discrete_values = [s['discrete_features'] for s in samples]
 continuous_values = [s['continuous_features'] for s in samples]
 
+print('\n#################### CHI SQUARED ######################\n')
+
 for feature_idx in range(len(discrete_values[0])):
-	feature_values = [c[feature_idx] for c in discrete_values]
+	feature_values = [d[feature_idx] for d in discrete_values]
 	fv_pop_counts = {}
 	col_total = [0, 0]
 	total = 0
@@ -43,4 +45,8 @@ for feature_idx in range(len(discrete_values[0])):
 	# pprint.pprint(exp_vector)
 	result = stats.chisquare(obs_vector, exp_vector)
 	print(result)
-	
+
+print('\n#################### COVARIANCE ######################\n')
+for feature_idx in range(len(continuous_values[0])):
+	feature_values = [c[feature_idx] for c in continuous_values]
+	print('Covariance between feature ' + str(feature_idx) + ' and popularity: ' + str(np.cov(feature_values, popularity_num)[0][1])) 
