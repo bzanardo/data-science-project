@@ -5,7 +5,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.decomposition import PCA
 
-input_name = 'data/processed_50_testing_data.json'
+input_name = 'data/processed_50_total_data.json'
 input_fp = open(input_name, 'r')
 samples = json.load(input_fp)
 
@@ -66,8 +66,8 @@ for num_components in range(2, 3):
         incorrect = 0
 
         for i in range(len(testing_labels)):
-            odds_unpopular = cont_pred[i][0] * (1.0 - disc_pred[i][0]) / (1.0 - percent_training_popular)
-            odds_popular = cont_pred[i][1] * (1.0 - disc_pred[i][1]) / percent_training_popular
+            odds_unpopular = cont_pred[i][0] * disc_pred[i][0] / (1.0 - percent_training_popular)
+            odds_popular = cont_pred[i][1] * disc_pred[i][1] / percent_training_popular
             prediction = odds_popular > odds_unpopular
             if prediction == testing_labels[i]:
                 correct += 1
