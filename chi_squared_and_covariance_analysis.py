@@ -22,13 +22,13 @@ print('\n#################### CHI SQUARED ######################\n')
 for feature_idx in range(len(discrete_values[0])):
 	feature_values = [d[feature_idx] for d in discrete_values]
 	fv_pop_counts = {}
-	col_total = [0, 0]
+	pop_total = [0, 0]
 	total = 0
 	for i in range(len(feature_values)):
 		if feature_values[i] not in fv_pop_counts:
 			fv_pop_counts[feature_values[i]] = [0, 0]
 		fv_pop_counts[feature_values[i]][popularity_flag[i]] += 1
-		col_total[popularity_flag[i]] += 1
+		pop_total[popularity_flag[i]] += 1
 		total += 1
 	obs_vector = []
 	exp_vector = []
@@ -37,16 +37,20 @@ for feature_idx in range(len(discrete_values[0])):
 			pop_counts[0] = 0.001
 		if pop_counts[1] == 0:
 			pop_counts[1] = 0.001
-		obs_vector.append(pop_counts)
-		exp_vector.append(
-			[(pop_counts[0] * col_total[0]) / float(total),
-			 (pop_counts[1] * col_total[1]) / float(total)])
+		pop_counts[0] = float(pop_counts[0])
+		pop_counts[1] = float(pop_counts[1])
+		obs_vector += pop_counts
+		exp_vector += \
+			[((pop_counts[0] + pop_counts[1]) * pop_total[0]) / float(total),
+			 ((pop_counts[0] + pop_counts[1]) * pop_total[1]) / float(total)]
 	print('Result for feature ' + str(feature_idx) + ' (' + \
 		discrete_feature_names[feature_idx] + ') which has the following values:')
 	pprint.pprint([k for k in fv_pop_counts])
 	# pprint.pprint(obs_vector)
 	# pprint.pprint(exp_vector)
-	result = stats.chisquare(obs_vector, exp_vector)
+	# ddof == (rows - 1) * (cols - 1)
+	ddof = (len(fv_pop_counts) - 1) * (2 - 1)
+	result = stats.chisquare(obs_vector, exp_vector, ddof=ddof)
 	print(result)
 
 print('\n#################### COVARIANCE ######################\n')
