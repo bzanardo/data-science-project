@@ -1,9 +1,10 @@
 import json
 import random
+import sys
 from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import MultinomialNB
 
-input_name = 'data/processed_50_testing_data.json'
+input_name = sys.argv[1]
 input_fp = open(input_name, 'r')
 samples = json.load(input_fp)
 
@@ -11,10 +12,16 @@ percent_training = 0.9
 
 random.seed()
 
-num_trials = 10000
+num_trials = 5000
 average_accuracy = 0
 average_cont_accuracy = 0
 average_disc_accuracy = 0
+
+for sample in samples:
+    cont = sample['continuous_features']
+    # sample['continuous_features'] = [cont[0], cont[1], cont[3], cont[4], cont[6]]
+    disc = sample['discrete_features']
+    # sample['discrete_features'] = [disc[1], disc[2]]
 
 for trial in range(num_trials):
     training_labels = []
