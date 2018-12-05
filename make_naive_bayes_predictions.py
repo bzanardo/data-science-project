@@ -4,7 +4,9 @@ import sys
 from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import MultinomialNB
 
-input_name = sys.argv[1]
+num_trials = int(sys.argv[1])
+
+input_name = sys.argv[2]
 input_fp = open(input_name, 'r')
 samples = json.load(input_fp)
 
@@ -12,7 +14,6 @@ percent_training = 0.9
 
 random.seed()
 
-num_trials = 5000
 average_accuracy = 0
 average_cont_accuracy = 0
 average_disc_accuracy = 0

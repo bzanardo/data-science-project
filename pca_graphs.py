@@ -8,35 +8,32 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
-num_trials = int(sys.argv[1])
-num_components = int(sys.argv[2])
-filter_c_features = int(sys.argv[3])
-filter_d_features = int(sys.argv[4])
-if filter_c_features and num_components > 5:
-    print('Capping num_components at 5.')
-    num_components = 5
-
-input_name = sys.argv[5]
+input_name = sys.argv[1]
 input_fp = open(input_name, 'r')
 samples = json.load(input_fp)
 
 percent_training = 0.9
+num_components = 10
 
 random.seed()
 
-average_accuracy = 0
-average_cont_accuracy = 0
-average_disc_accuracy = 0
+for trial in range(3):
+    if trial == 0:
+        print('Using all continuous features.\n')
+    if trial == 1:
+        print('\nNow using acousticness, danceability, energy, instrumentalness, and loudness.\n')
+        num_components = 5
+    if trial == 2:
+        print('\nNow using acousticness, energy, instrumentalness, and loudness.\n')
+        num_components = 4
+    for sample in samples:
+        if trial == 1:
+            cont = sample['continuous_features']
+            sample['continuous_features'] = [cont[0], cont[1], cont[3], cont[4], cont[6]]
+        if trial == 2:
+            cont = sample['continuous_features']
+            sample['continuous_features'] = [cont[0], cont[2], cont[3], cont[4]]
 
-for sample in samples:
-    if filter_c_features:
-        cont = sample['continuous_features']
-        sample['continuous_features'] = [cont[0], cont[1], cont[3], cont[4], cont[6]]
-    if filter_d_features:
-        disc = sample['discrete_features']
-        sample['discrete_features'] = [disc[1], disc[2]]
-
-for trial in range(num_trials):
     training_labels = []
     training_continuous = []
     training_discrete = []
@@ -68,7 +65,8 @@ for trial in range(num_trials):
     training_continuous = training_continuous.dot(np.transpose(pca.components_))
     testing_continuous = testing_continuous.dot(np.transpose(pca.components_))
 
-    # pprint.pprint(pca.components_)
+    print('PCA Components:')
+    pprint.pprint(pca.components_)
 
     cont_nb = GaussianNB()
     disc_nb = MultinomialNB()
@@ -97,12 +95,8 @@ for trial in range(num_trials):
             pred_color[i] = 'blue'
         if (cont_pred[i][0] < cont_pred[i][1]) != testing_labels[i]:
             score_color[i] = 'red'
-
-    average_accuracy += correct / float(correct + incorrect)
-    average_cont_accuracy += cont_nb.score(testing_continuous, testing_labels)
-    average_disc_accuracy += disc_nb.score(testing_discrete, testing_labels)
        
-    if False:
+    if True:
         plt.rcParams.update({'font.size': 24})
         plt.scatter([c[0] for c in testing_continuous], [c[1] for c in testing_continuous], c=pred_color)
         plt.title('Predictions When Using PCA (First 2 Components)')
@@ -114,16 +108,3 @@ for trial in range(num_trials):
         plt.xlabel('Component 1')
         plt.ylabel('Component 2')
         plt.show()
-
-average_accuracy /= num_trials
-average_cont_accuracy /= num_trials
-average_disc_accuracy /= num_trials
-
-print('\t############ average_accuracy #############')
-print('\t' + str(average_accuracy))
-
-print('\t############ average_cont_accuracy #############')
-print('\t' + str(average_cont_accuracy))
-
-print('\t############ average_disc_accuracy #############')
-print('\t' + str(average_disc_accuracy))
